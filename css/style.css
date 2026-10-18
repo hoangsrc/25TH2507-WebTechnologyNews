@@ -1,11 +1,22 @@
-/* Bo cuc chung va sticky footer */
+:root {
+    --primary-red: #990000;
+    --primary-hover: #7a0000;
+    --navy-blue: #003366;
+    --text-dark: #1f2937;
+    --text-muted: #555555;
+    --border-gray: #e5e7eb;
+    --bg-page: #f9fafb;
+}
+
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #f4f5f6;
-    color: #222;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-dark);
+    font-family: Arial, "Helvetica Neue", "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
 }
 
 body {
@@ -23,108 +34,230 @@ footer {
 }
 
 /* Header */
-.top-header {
+.site-header {
     background-color: #ffffff;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--border-gray);
 }
 
-.brand-logo {
-    font-size: 26px;
-    font-weight: 800;
-    color: #b70000;
+.site-logo {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-red);
     text-decoration: none;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
 }
 
-.brand-logo span {
-    color: #0056b3;
+.site-logo span {
+    color: var(--navy-blue);
+    font-style: italic;
+    font-size: 22px;
 }
 
-.header-date {
-    font-size: 13px;
-    color: #666;
-    border-left: 1px solid #ddd;
-    padding-left: 12px;
+.site-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    border-left: 1px solid #ccc;
+    padding-left: 10px;
+    margin-left: 10px;
 }
 
-.nav-category-bar {
+/* Menu chuyen muc */
+.category-navbar {
     background-color: #ffffff;
-    border-bottom: 2px solid #b70000;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    border-bottom: 2px solid var(--primary-red);
 }
 
-.nav-category-bar .nav-link {
+.category-navbar .nav-link {
+    color: #222;
+    font-weight: 700;
     font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    padding: 10px 14px;
+    padding: 8px 12px;
+    text-transform: uppercase;
 }
 
-.nav-category-bar .nav-link:hover,
-.nav-category-bar .nav-link.active {
-    color: #b70000;
+.category-navbar .nav-link:hover,
+.category-navbar .nav-link.active {
+    color: var(--primary-red);
 }
 
-/* Khu vuc tin tieu diem */
-.featured-box {
+/* Tin tieu diem */
+.lead-article {
     background: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-gray);
+    padding: 15px;
+    margin-bottom: 20px;
 }
 
-.featured-img {
+.lead-article-title {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.lead-article-title a {
+    color: #111;
+    text-decoration: none;
+}
+
+.lead-article-title a:hover {
+    color: var(--primary-red);
+}
+
+.lead-img {
     width: 100%;
-    height: 340px;
+    height: 330px;
     object-fit: cover;
 }
 
-/* cac card khu vuc bai viet ben duoi */
-.post-card {
+/* Danh sach tin */
+.article-item {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border-gray);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-.post-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-}
-
-.card-img-top {
+.article-thumb {
+    width: 100%;
     height: 170px;
     object-fit: cover;
 }
 
-.sidebar-box {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 18px;
+.article-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-/* Footer */
-.footer-thanhnien {
-    background-color: #ffffff;
-    border-top: 3px solid #0056b3;
+.article-category {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary-red);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    text-decoration: none;
+}
+
+.article-title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.article-title a {
+    color: #222;
+    text-decoration: none;
+}
+
+.article-title a:hover {
+    color: var(--primary-red);
+}
+
+.article-desc {
+    font-size: 13px;
+    color: #555;
+    flex-grow: 1;
+    margin-bottom: 10px;
+}
+
+.article-meta {
+    font-size: 12px;
+    color: #888;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 6px;
+}
+
+/* Sidebar doc nhieu */
+.sidebar-panel {
+    background: #ffffff;
+    border: 1px solid var(--border-gray);
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.panel-header {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary-red);
+    border-bottom: 2px solid var(--primary-red);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ranking-item:last-child {
+    border-bottom: none;
+}
+
+.ranking-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: #999;
+    width: 30px;
+    line-height: 1;
+}
+
+.ranking-title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.ranking-title a {
+    color: #222;
+    text-decoration: none;
+}
+
+.ranking-title a:hover {
+    color: var(--primary-red);
+}
+
+/* Nut phan trang  */
+.pagination .page-item .page-link {
     color: #333;
+    border-color: #ddd;
+    border-radius: 0;
     font-size: 13px;
 }
 
-.footer-thanhnien a {
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: #fff;
+}
+
+/* Footer */
+.site-footer {
+    background-color: #ffffff;
+    border-top: 2px solid var(--navy-blue);
+    font-size: 13px;
+    color: #444;
+}
+
+.footer-section-title {
+    font-weight: 700;
+    color: var(--navy-blue);
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.site-footer a {
     color: #444;
     text-decoration: none;
 }
 
-.footer-thanhnien a:hover {
-    color: #0056b3;
-}
-
-.footer-title {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 12px;
-    color: #0056b3;
+.site-footer a:hover {
+    color: var(--primary-red);
 }
