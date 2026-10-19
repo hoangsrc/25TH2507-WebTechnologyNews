@@ -74,7 +74,7 @@ $res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDE
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bản Tin Công Nghệ - TechNews</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/style.css?v=<?= time() ?>" rel="stylesheet">
 </head>
 <body>
 
@@ -289,10 +289,10 @@ $res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDE
 
             <div class="d-flex flex-wrap justify-content-between align-items-center small text-muted">
                 <div>
-                    <strong>TECHNEWS.VN</strong> - Trang thông tin điện tử công nghệ mô phỏng
+                    <strong>TECHNEWS.VN</strong> - Trang thông tin điện tử công nghệ  &copy; 2026 TechNews  
                 </div>
                 <div>
-                    Bản quyền &copy; 2026 TechNews. Mọi quyền được bảo lưu.
+                    Website phục vụ mục đích học tập <span style="font-weight: bold; font-size: 1.2em;">|</span> Học phần: Phát Triển Phần Mềm Mã Nguồn Mở <span style="font-weight: bold; font-size: 1.2em;">|</span> Sinh viên thực hiện: MSSV - 25TH2507
                 </div>
             </div>
         </div>

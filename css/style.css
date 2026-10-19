@@ -33,6 +33,13 @@ footer {
     flex-shrink: 0;
 }
 
+/* Quy tac bat buoc: anh khong bao gio duoc vuot qua khung chua */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
 /* Header */
 .site-header {
     background-color: #ffffff;
@@ -62,7 +69,7 @@ footer {
     margin-left: 10px;
 }
 
-/* Menu chuyen muc */
+/* Navbar chuyen muc */
 .category-navbar {
     background-color: #ffffff;
     border-bottom: 2px solid var(--primary-red);
@@ -87,10 +94,11 @@ footer {
     border: 1px solid var(--border-gray);
     padding: 15px;
     margin-bottom: 20px;
+    overflow: hidden;
 }
 
 .lead-article-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     line-height: 1.3;
 }
@@ -105,24 +113,26 @@ footer {
 }
 
 .lead-img {
-    width: 100%;
-    height: 330px;
-    object-fit: cover;
+    width: 100% !important;
+    height: 300px !important;
+    object-fit: cover !important;
 }
 
-/* Danh sach tin */
+/* Card danh sach tin */
 .article-item {
     background: #ffffff;
     border: 1px solid var(--border-gray);
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
+/* Khoa cung kich thuoc anh card, bat chap anh goc to co nao */
 .article-thumb {
-    width: 100%;
-    height: 170px;
-    object-fit: cover;
+    width: 100% !important;
+    height: 180px !important;
+    object-fit: cover !important;
 }
 
 .article-body {
@@ -192,6 +202,7 @@ footer {
 .ranking-item {
     display: flex;
     align-items: flex-start;
+    gap: 8px;
     padding: 8px 0;
     border-bottom: 1px solid #f0f0f0;
 }
@@ -201,17 +212,20 @@ footer {
 }
 
 .ranking-num {
-    font-size: 22px;
-    font-weight: 800;
-    color: #999;
-    width: 30px;
-    line-height: 1;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-red);
+    width: 20px;
+    flex-shrink: 0;
+    line-height: 1.4;
+    margin: 0;
 }
 
 .ranking-title {
     font-size: 13px;
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.4;
+    margin: 0;
 }
 
 .ranking-title a {
@@ -223,7 +237,7 @@ footer {
     color: var(--primary-red);
 }
 
-/* Nut phan trang  */
+/* Phan trang */
 .pagination .page-item .page-link {
     color: #333;
     border-color: #ddd;

@@ -12,7 +12,7 @@ if (!isset($_SESSION['admin'])) {
 $sql = "SELECT posts.*, categories.name AS cat_name 
         FROM posts 
         JOIN categories ON posts.category_id = categories.id 
-        ORDER BY posts.id DESC";
+        ORDER BY posts.id ASC";
 $result = mysqli_query($conn, $sql);
 ?>
 <!DOCTYPE html>
