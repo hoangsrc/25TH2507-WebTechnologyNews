@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Neu da dang nhap roi thi chuyen thang vao trang admin
+// Neu da dang nhap roi thi chuyen vao admin
 if (isset($_SESSION['admin'])) {
     header("Location: admin.php");
     exit();
@@ -17,17 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($username) || empty($password)) {
         $error = 'Vui lòng nhập đầy đủ tài khoản và mật khẩu!';
     } else {
-        // Dung Prepared Statement chong SQL Injection
+        // Dung Prepared Statement
         $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE username = ?");
         mysqli_stmt_bind_param($stmt, "s", $username);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
         $user = mysqli_fetch_assoc($result);
 
-        // Kiem tra mat khau
         if ($user && (password_verify($password, $user['password']) || $password === $user['password'])) {
             $_SESSION['admin'] = $user['username'];
             $_SESSION['fullname'] = $user['fullname'];
+            // Luu chinh xac quyen role tu CSDL
+            $_SESSION['role'] = !empty($user['role']) ? $user['role'] : 'editor';
+
             header("Location: admin.php");
             exit();
         } else {
@@ -43,14 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Nhập Quản Trị - TechNews</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/style.css?v=<?= time() ?>" rel="stylesheet">
 </head>
 <body class="bg-light">
 
     <div class="main-wrapper d-flex align-items-center justify-content-center py-5">
         <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
             <div class="text-center mb-3">
-                <span class="brand-logo fs-3">TECH<span>NEWS</span></span>
+                <span class="site-logo fs-3">TECHNEWS<span>.vn</span></span>
                 <p class="text-muted small mt-1">Đăng nhập hệ thống quản trị</p>
             </div>
             
@@ -73,9 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>
 
-    <footer class="footer-thanhnien py-3 text-center">
-        <div class="container">
-            <small class="text-muted">Hệ thống quản lý tin tức công nghệ &copy; 2026</small>
+    <footer class="site-footer py-3 text-center border-top">
+        <div class="container small text-muted">
+            Hệ thống quản lý tin tức công nghệ &copy; 2026
         </div>
     </footer>
 

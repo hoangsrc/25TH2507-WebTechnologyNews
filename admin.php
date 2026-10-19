@@ -2,13 +2,15 @@
 session_start();
 require_once 'db.php';
 
-// Kiem tra session dang nhap
+// Kiem tra dang nhap
 if (!isset($_SESSION['admin'])) {
     header("Location: login.php");
     exit();
 }
 
-// Lay danh sach tat ca bai viet kem ten danh muc
+// Lay vai tro hien tai
+$current_role = $_SESSION['role'] ?? 'editor';
+
 $sql = "SELECT posts.*, categories.name AS cat_name 
         FROM posts 
         JOIN categories ON posts.category_id = categories.id 
@@ -22,17 +24,23 @@ $result = mysqli_query($conn, $sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Trị Bài Viết - TechNews</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/style.css?v=<?= time() ?>" rel="stylesheet">
 </head>
 <body class="bg-light">
 
     <div class="main-wrapper">
-        <!-- Thanh menu quan tri -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="admin.php">TechNews Admin</a>
                 <div class="d-flex align-items-center gap-3">
-                    <span class="text-light small">Xin chào, <strong><?= htmlspecialchars($_SESSION['fullname']) ?></strong></span>
+                    <span class="text-light small">
+                        Xin chào: <strong><?= htmlspecialchars($_SESSION['fullname']) ?></strong>
+                        <?php if ($current_role === 'admin'): ?>
+                            <span class="badge bg-danger ms-1">Quản trị viên</span>
+                        <?php else: ?>
+                            <span class="badge bg-info text-dark ms-1">Biên tập viên</span>
+                        <?php endif; ?>
+                    </span>
                     <a href="index.php" class="btn btn-outline-light btn-sm" target="_blank">Xem trang chủ</a>
                     <a href="logout.php" class="btn btn-danger btn-sm">Đăng xuất</a>
                 </div>
@@ -56,7 +64,7 @@ $result = mysqli_query($conn, $sql);
                                     <th>Tiêu đề bài viết</th>
                                     <th style="width: 180px;">Chuyên mục</th>
                                     <th style="width: 120px;">Ngày đăng</th>
-                                    <th style="width: 140px;" class="text-center">Thao tác</th>
+                                    <th style="width: 160px;" class="text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,9 +86,15 @@ $result = mysqli_query($conn, $sql);
                                             <td class="small text-muted"><?= date('d/m/Y', strtotime($row['created_at'])) ?></td>
                                             <td class="text-center">
                                                 <a href="edit_post.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm py-0 px-2">Sửa</a>
-                                                <a href="delete_post.php?id=<?= $row['id'] ?>" 
-                                                   onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');" 
-                                                   class="btn btn-danger btn-sm py-0 px-2">Xóa</a>
+                                                
+                                                <!-- Phân quyền hiển thị nút Xóa -->
+                                                <?php if ($current_role === 'admin'): ?>
+                                                    <a href="delete_post.php?id=<?= $row['id'] ?>" 
+                                                       onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');" 
+                                                       class="btn btn-danger btn-sm py-0 px-2">Xóa</a>
+                                                <?php else: ?>
+                                                    <button class="btn btn-secondary btn-sm py-0 px-2" disabled title="Chỉ Admin mới có quyền xóa">Khóa</button>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -97,9 +111,9 @@ $result = mysqli_query($conn, $sql);
         </div>
     </div>
 
-    <footer class="bg-dark text-white text-center py-3">
-        <div class="container">
-            <small>Hệ thống quản lý tin tức công nghệ &copy; 2026</small>
+    <footer class="site-footer py-3 text-center border-top">
+        <div class="container small text-muted">
+            Hệ thống quản trị tin tức công nghệ &copy; 2026
         </div>
     </footer>
 

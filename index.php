@@ -26,7 +26,24 @@ if (count($where) > 0) {
 // Phan trang
 $limit = 4;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+// Neu nhap so am hoac chuoi ky tu (abc, -5, 0) thi ep ve trang 1
 if ($page < 1) $page = 1;
+
+$sql_count = "SELECT COUNT(*) AS total FROM posts $where_clause";
+$res_count = mysqli_query($conn, $sql_count);
+$row_count = mysqli_fetch_assoc($res_count);
+$total_records = $row_count['total'] ?? 0;
+
+$total_pages = ceil($total_records / $limit);
+// Neu khong co bai nao, mac dinh tong so trang la 1
+if ($total_pages < 1) $total_pages = 1;
+
+// Neu co tinh go so trang vuot qua tong so trang co that (vd: page=999999)
+if ($page > $total_pages) {
+    $page = $total_pages;
+}
+
+$offset = ($page - 1) * $limit;
 
 $sql_count = "SELECT COUNT(*) AS total FROM posts $where_clause";
 $res_count = mysqli_query($conn, $sql_count);
