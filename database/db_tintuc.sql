@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 18, 2026 at 04:36 PM
+-- Generation Time: Oct 19, 2026 at 05:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -67,7 +67,8 @@ INSERT INTO `posts` (`id`, `category_id`, `title`, `summary`, `content`, `image`
 (2, 2, 'Xu hướng laptop mỏng nhẹ dành cho học sinh, sinh viên', 'Các mẫu máy tính xách tay phân khúc tầm trung đáp ứng tốt nhu cầu học tập và lập trình.', 'Với trọng lượng chỉ khoảng 1.3kg cùng thời lượng pin lên đến 10 tiếng, thế hệ laptop mới mang lại sự tiện lợi tối đa cho người dùng thường xuyên phải di chuyển.', 'XuHuongLapTopHSSV.jpg', '2026-10-16 20:30:51'),
 (3, 3, 'Ứng dụng thực tế của công nghệ mới trong đời sống', 'Các giải pháp tự động hóa giúp tối ưu hóa hiệu suất làm việc và giải phóng sức lao động.', 'Từ việc quản lý nhà thông minh, điều khiển giao thông đến hỗ trợ y tế từ xa, công nghệ đang ngày càng hiện diện rõ nét và nâng cao chất lượng cuộc sống của con người.', 'CongNgheDoiSong.jpg', '2026-10-16 20:30:51'),
 (4, 4, 'Khám phá vũ trụ bao la qua kính viễn vọng không gian', 'Những hình ảnh sắc nét về các cụm thiên hà cách xa Trái Đất hàng triệu năm ánh sáng.', 'Kính viễn vọng thế hệ mới vừa gửi về những dữ liệu quý giá về các hành tinh ngoài hệ mặt trời, mở ra cơ hội lớn cho việc tìm kiếm những hành tinh có điều kiện sống tương tự Trái Đất.', 'KhamPhaVuTru.jpg', '2026-10-16 20:30:51'),
-(5, 1, 'Công nghệ pin mới giúp kéo dài thời gian sử dụng thiết bị', 'Phát minh đột phá về vật liệu giúp sạc siêu nhanh và tăng tuổi thọ pin gấp nhiều lần.', 'Nhờ việc ứng dụng vật liệu bán dẫn tiên tiến, tốc độ truyền năng lượng được tăng lên đáng kể mà không sinh ra lượng nhiệt lớn, đảm bảo an toàn tuyệt đối khi sử dụng.', 'CongNghePinMoi.jpg', '2026-10-16 20:30:51');
+(5, 1, 'Công nghệ pin mới giúp kéo dài thời gian sử dụng thiết bị', 'Phát minh đột phá về vật liệu giúp sạc siêu nhanh và tăng tuổi thọ pin gấp nhiều lần.', 'Nhờ việc ứng dụng vật liệu bán dẫn tiên tiến, tốc độ truyền năng lượng được tăng lên đáng kể mà không sinh ra lượng nhiệt lớn, đảm bảo an toàn tuyệt đối khi sử dụng.', 'CongNghePinMoi.jpg', '2026-10-16 20:30:51'),
+(6, 3, 'Dùng Claude Opus để ‘mổ xẻ’ TV LG cũ, lập trình viên tăng tốc ứng dụng gấp 10 lần', 'Trong khi LG không công khai bộ công cụ phát triển ứng dụng cho TV của mình, lập trình viên này phải dùng đến AI Claude để xây dựng bộ ứng dụng mới cho thiết bị.', 'A B C D E F G H I', '1792415272_claudeopus.jpg', '2026-10-19 20:07:52');
 
 -- --------------------------------------------------------
 
@@ -79,16 +80,17 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `fullname` varchar(100) NOT NULL
+  `fullname` varchar(100) NOT NULL,
+  `role` varchar(20) NOT NULL DEFAULT 'editor'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `fullname`) VALUES
-(1, 'admin', '$2y$10$xoYFX1mFPxBSyxaRe3iIRutxkIWhxGShzEhjYUVd3qpCUKfJE1k7a', 'Quản Trị Viên'),
-(2, 'bientapvien', '$2y$10$xoYFX1mFPxBSyxaRe3iIRutxkIWhxGShzEhjYUVd3qpCUKfJE1k7a', 'Nguyễn Văn A');
+INSERT INTO `users` (`id`, `username`, `password`, `fullname`, `role`) VALUES
+(1, 'admin', '$2y$10$xoYFX1mFPxBSyxaRe3iIRutxkIWhxGShzEhjYUVd3qpCUKfJE1k7a', 'Quản Trị Viên', 'admin'),
+(2, 'bientapvien', '$2y$10$xoYFX1mFPxBSyxaRe3iIRutxkIWhxGShzEhjYUVd3qpCUKfJE1k7a', 'Nguyễn Văn A', 'editor');
 
 --
 -- Indexes for dumped tables
@@ -127,7 +129,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `users`
