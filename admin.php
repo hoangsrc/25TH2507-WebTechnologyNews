@@ -8,9 +8,21 @@ if (!isset($_SESSION['admin'])) {
     exit();
 }
 
-// Lay vai tro hien tai
 $current_role = $_SESSION['role'] ?? 'editor';
 
+// Xu ly Duyet bai viet danh rieng cho Admin
+if (isset($_GET['approve_id']) && $current_role === 'admin') {
+    $approve_id = (int)$_GET['approve_id'];
+    if ($approve_id > 0) {
+        $stmt_app = mysqli_prepare($conn, "UPDATE posts SET status = 1 WHERE id = ?");
+        mysqli_stmt_bind_param($stmt_app, "i", $approve_id);
+        mysqli_stmt_execute($stmt_app);
+        header("Location: admin.php");
+        exit();
+    }
+}
+
+// Lay danh sach tat ca bai viet
 $sql = "SELECT posts.*, categories.name AS cat_name 
         FROM posts 
         JOIN categories ON posts.category_id = categories.id 
@@ -59,12 +71,13 @@ $result = mysqli_query($conn, $sql);
                         <table class="table table-bordered table-hover align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th style="width: 50px;" class="text-center">ID</th>
-                                    <th style="width: 90px;" class="text-center">Hình ảnh</th>
+                                    <th style="width: 45px;" class="text-center">ID</th>
+                                    <th style="width: 80px;" class="text-center">Hình ảnh</th>
                                     <th>Tiêu đề bài viết</th>
-                                    <th style="width: 180px;">Chuyên mục</th>
-                                    <th style="width: 120px;">Ngày đăng</th>
-                                    <th style="width: 160px;" class="text-center">Thao tác</th>
+                                    <th style="width: 140px;">Chuyên mục</th>
+                                    <th style="width: 70px;" class="text-center">Xem</th>
+                                    <th style="width: 110px;" class="text-center">Trạng thái</th>
+                                    <th style="width: 170px;" class="text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,7 +87,7 @@ $result = mysqli_query($conn, $sql);
                                             <td class="text-center fw-bold"><?= $row['id'] ?></td>
                                             <td class="text-center">
                                                 <img src="uploads/<?= !empty($row['image']) ? $row['image'] : 'default.jpg' ?>" 
-                                                     alt="Thumb" class="rounded" style="width: 65px; height: 45px; object-fit: cover;"
+                                                     alt="Thumb" class="rounded" style="width: 60px; height: 40px; object-fit: cover;"
                                                      onerror="this.src='uploads/default.jpg'">
                                             </td>
                                             <td>
@@ -83,11 +96,22 @@ $result = mysqli_query($conn, $sql);
                                                 </a>
                                             </td>
                                             <td><span class="badge bg-secondary"><?= htmlspecialchars($row['cat_name']) ?></span></td>
-                                            <td class="small text-muted"><?= date('d/m/Y', strtotime($row['created_at'])) ?></td>
+                                            <td class="text-center small text-muted"><?= $row['views'] ?></td>
                                             <td class="text-center">
+                                                <?php if ($row['status'] == 1): ?>
+                                                    <span class="badge bg-success">Đã duyệt</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-center">
+                                                <!-- Nut Duyet chi hien khi bai cho duyet va nguoi dung la Admin -->
+                                                <?php if ($row['status'] == 0 && $current_role === 'admin'): ?>
+                                                    <a href="admin.php?approve_id=<?= $row['id'] ?>" class="btn btn-success btn-sm py-0 px-2" title="Duyệt bài xuất bản">Duyệt</a>
+                                                <?php endif; ?>
+
                                                 <a href="edit_post.php?id=<?= $row['id'] ?>" class="btn btn-primary btn-sm py-0 px-2">Sửa</a>
                                                 
-                                                <!-- Phân quyền hiển thị nút Xóa -->
                                                 <?php if ($current_role === 'admin'): ?>
                                                     <a href="delete_post.php?id=<?= $row['id'] ?>" 
                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');" 
@@ -100,7 +124,7 @@ $result = mysqli_query($conn, $sql);
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">Chưa có bài viết nào.</td>
+                                        <td colspan="7" class="text-center py-4 text-muted">Chưa có bài viết nào.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -113,7 +137,7 @@ $result = mysqli_query($conn, $sql);
 
     <footer class="site-footer py-3 text-center border-top">
         <div class="container small text-muted">
-            Hệ thống quản trị tin tức công nghệ &copy; 2026
+            Hệ thống quản trị tin tức công nghệ&copy; 2026
         </div>
     </footer>
 

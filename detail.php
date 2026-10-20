@@ -3,6 +3,14 @@ require_once 'db.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
+if ($id > 0) {
+    // Tang luot xem them 1 truoc
+    $update_views = mysqli_prepare($conn, "UPDATE posts SET views = views + 1 WHERE id = ?");
+    mysqli_stmt_bind_param($update_views, "i", $id);
+    mysqli_stmt_execute($update_views);
+}
+
+// Lay thong tin bai viet (se lay luon so luot xem moi nhat)
 $stmt = mysqli_prepare($conn, "SELECT posts.*, categories.name AS cat_name 
                                FROM posts 
                                JOIN categories ON posts.category_id = categories.id 

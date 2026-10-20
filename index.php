@@ -9,7 +9,9 @@ $today_text = $weekday_map[date('w')] . ', ' . date('d/m/Y');
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $cat_id = isset($_GET['cat_id']) ? (int)$_GET['cat_id'] : 0;
 
-$where = [];
+// Bat buoc: Chi hien thi bai viet DA DUOC DUYET (status = 1) ra trang chu
+$where = ["posts.status = 1"];
+
 if ($search !== '') {
     $safe_search = mysqli_real_escape_string($conn, $search);
     $where[] = "posts.title LIKE '%$safe_search%'";
@@ -18,15 +20,11 @@ if ($cat_id > 0) {
     $where[] = "posts.category_id = $cat_id";
 }
 
-$where_clause = "";
-if (count($where) > 0) {
-    $where_clause = "WHERE " . implode(" AND ", $where);
-}
+$where_clause = "WHERE " . implode(" AND ", $where);
 
-// Phan trang
+// Phan trang an toan
 $limit = 4;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-// Neu nhap so am hoac chuoi ky tu (abc, -5, 0) thi ep ve trang 1
 if ($page < 1) $page = 1;
 
 $sql_count = "SELECT COUNT(*) AS total FROM posts $where_clause";
@@ -35,25 +33,15 @@ $row_count = mysqli_fetch_assoc($res_count);
 $total_records = $row_count['total'] ?? 0;
 
 $total_pages = ceil($total_records / $limit);
-// Neu khong co bai nao, mac dinh tong so trang la 1
 if ($total_pages < 1) $total_pages = 1;
 
-// Neu co tinh go so trang vuot qua tong so trang co that (vd: page=999999)
 if ($page > $total_pages) {
     $page = $total_pages;
 }
 
 $offset = ($page - 1) * $limit;
 
-$sql_count = "SELECT COUNT(*) AS total FROM posts $where_clause";
-$res_count = mysqli_query($conn, $sql_count);
-$row_count = mysqli_fetch_assoc($res_count);
-$total_records = $row_count['total'] ?? 0;
-
-$total_pages = ceil($total_records / $limit);
-$offset = ($page - 1) * $limit;
-
-// Lay danh sach tin chinh
+// Lay danh sach tin chinh da duyet
 $sql_posts = "SELECT posts.*, categories.name AS cat_name 
               FROM posts 
               JOIN categories ON posts.category_id = categories.id 
@@ -62,12 +50,13 @@ $sql_posts = "SELECT posts.*, categories.name AS cat_name
               LIMIT $offset, $limit";
 $res_posts = mysqli_query($conn, $sql_posts);
 
-// Lay bai tieu diem
+// Lay bai tieu diem (chi hien o trang dau tien khi khong tim kiem)
 $featured_post = null;
 if (empty($search) && $cat_id == 0 && $page == 1) {
     $res_lead = mysqli_query($conn, "SELECT posts.*, categories.name AS cat_name 
                                     FROM posts 
                                     JOIN categories ON posts.category_id = categories.id 
+                                    WHERE posts.status = 1
                                     ORDER BY posts.id DESC LIMIT 1");
     $featured_post = mysqli_fetch_assoc($res_lead);
 }
@@ -81,8 +70,8 @@ if ($res_cats) {
     }
 }
 
-// Lay danh sach tin doc nhieu cho sidebar
-$res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDER BY id ASC LIMIT 5");
+// Logic: Lay danh sach tin doc nhieu theo LUOT XEM THAT (views DESC)
+$res_popular = mysqli_query($conn, "SELECT id, title, views FROM posts WHERE status = 1 ORDER BY views DESC LIMIT 5");
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -154,8 +143,9 @@ $res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDE
                                 </a>
                             </h2>
                             <p class="text-secondary small mb-3"><?= htmlspecialchars($featured_post['summary']) ?></p>
-                            <div class="small text-muted">
-                                Xuất bản: <?= date('d/m/Y H:i', strtotime($featured_post['created_at'])) ?>
+                            <div class="small text-muted d-flex justify-content-between">
+                                <span>Xuất bản: <?= date('d/m/Y H:i', strtotime($featured_post['created_at'])) ?></span>
+                                <span>Lượt xem: <?= $featured_post['views'] ?></span>
                             </div>
                         </div>
                     </div>
@@ -191,9 +181,9 @@ $res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDE
                                             <div class="article-desc">
                                                 <?= htmlspecialchars($row['summary']) ?>
                                             </div>
-                                            <div class="article-meta">
+                                            <div class="article-meta d-flex justify-content-between">
                                                 <span><?= date('d/m/Y', strtotime($row['created_at'])) ?></span>
-                                                <a href="detail.php?id=<?= $row['id'] ?>" class="float-end text-dark">Chi tiết &rarr;</a>
+                                                <span class="text-muted"><?= $row['views'] ?> lượt xem</span>
                                             </div>
                                         </div>
                                     </div>
@@ -232,9 +222,8 @@ $res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDE
                     <?php endif; ?>
                 </div>
 
-                <!-- Cột phai: Tin doc nhieu + chuyen muc -->
+                <!-- Cot phai: Tin doc nhieu xep theo views that -->
                 <div class="col-lg-4">
-                    <!-- Bang xep hang tin doc nhieu -->
                     <div class="sidebar-panel">
                         <div class="panel-header">Đọc nhiều nhất</div>
                         <?php $rank = 1; ?>
@@ -243,12 +232,12 @@ $res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDE
                                 <div class="ranking-num">0<?= $rank++ ?></div>
                                 <div class="ranking-title">
                                     <a href="detail.php?id=<?= $pop['id'] ?>"><?= htmlspecialchars($pop['title']) ?></a>
+                                    <small class="text-muted d-block"><?= $pop['views'] ?> lượt xem</small>
                                 </div>
                             </div>
                         <?php endwhile; ?>
                     </div>
 
-                    <!-- Danh muc nhanh -->
                     <div class="sidebar-panel">
                         <div class="panel-header">Chuyên mục chính</div>
                         <ul class="list-unstyled m-0">
@@ -261,11 +250,21 @@ $res_popular = mysqli_query($conn, "SELECT id, title, created_at FROM posts ORDE
                             <?php endforeach; ?>
                         </ul>
                     </div>
+
+                    <div class="sidebar-panel">
+                        <div class="panel-header">Thông tin tòa soạn</div>
+                        <p class="small text-muted mb-2">Đường dây nóng đóng góp tin bài công nghệ:</p>
+                        <p class="fw-bold text-danger fs-5 mb-2">1900 xxxx</p>
+                        <p class="small text-muted mb-0">
+                            Email: contact@technews.vn<br>
+                            Hệ thống tổng hợp và cập nhật tin tức công nghệ trực tuyến.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <!-- Footer bao chi -->
     <footer class="site-footer pt-4 pb-3">
         <div class="container">
