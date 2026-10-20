@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2026 at 05:08 PM
+-- Generation Time: Oct 20, 2026 at 08:04 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -55,20 +55,21 @@ CREATE TABLE `posts` (
   `summary` text NOT NULL,
   `content` longtext NOT NULL,
   `image` varchar(255) NOT NULL DEFAULT 'default.jpg',
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `views` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `posts`
 --
 
-INSERT INTO `posts` (`id`, `category_id`, `title`, `summary`, `content`, `image`, `created_at`) VALUES
-(1, 1, 'Đánh giá các dòng smartphone mới nhất năm nay', 'Những dòng điện thoại cao cấp sở hữu chip xử lý mạnh mẽ và thời lượng pin sử dụng cả ngày.', 'Thị trường điện thoại thông minh năm nay tập trung vào các tính năng trí tuệ nhân tạo tích hợp trực tiếp trên máy. Ngoài ra, công nghệ tản nhiệt buồng hơi mới giúp máy luôn mát mẻ khi chơi game hoặc quay phim chất lượng cao.', 'DienThoai.jpg', '2026-10-16 20:30:51'),
-(2, 2, 'Xu hướng laptop mỏng nhẹ dành cho học sinh, sinh viên', 'Các mẫu máy tính xách tay phân khúc tầm trung đáp ứng tốt nhu cầu học tập và lập trình.', 'Với trọng lượng chỉ khoảng 1.3kg cùng thời lượng pin lên đến 10 tiếng, thế hệ laptop mới mang lại sự tiện lợi tối đa cho người dùng thường xuyên phải di chuyển.', 'XuHuongLapTopHSSV.jpg', '2026-10-16 20:30:51'),
-(3, 3, 'Ứng dụng thực tế của công nghệ mới trong đời sống', 'Các giải pháp tự động hóa giúp tối ưu hóa hiệu suất làm việc và giải phóng sức lao động.', 'Từ việc quản lý nhà thông minh, điều khiển giao thông đến hỗ trợ y tế từ xa, công nghệ đang ngày càng hiện diện rõ nét và nâng cao chất lượng cuộc sống của con người.', 'CongNgheDoiSong.jpg', '2026-10-16 20:30:51'),
-(4, 4, 'Khám phá vũ trụ bao la qua kính viễn vọng không gian', 'Những hình ảnh sắc nét về các cụm thiên hà cách xa Trái Đất hàng triệu năm ánh sáng.', 'Kính viễn vọng thế hệ mới vừa gửi về những dữ liệu quý giá về các hành tinh ngoài hệ mặt trời, mở ra cơ hội lớn cho việc tìm kiếm những hành tinh có điều kiện sống tương tự Trái Đất.', 'KhamPhaVuTru.jpg', '2026-10-16 20:30:51'),
-(5, 1, 'Công nghệ pin mới giúp kéo dài thời gian sử dụng thiết bị', 'Phát minh đột phá về vật liệu giúp sạc siêu nhanh và tăng tuổi thọ pin gấp nhiều lần.', 'Nhờ việc ứng dụng vật liệu bán dẫn tiên tiến, tốc độ truyền năng lượng được tăng lên đáng kể mà không sinh ra lượng nhiệt lớn, đảm bảo an toàn tuyệt đối khi sử dụng.', 'CongNghePinMoi.jpg', '2026-10-16 20:30:51'),
-(6, 3, 'Dùng Claude Opus để ‘mổ xẻ’ TV LG cũ, lập trình viên tăng tốc ứng dụng gấp 10 lần', 'Trong khi LG không công khai bộ công cụ phát triển ứng dụng cho TV của mình, lập trình viên này phải dùng đến AI Claude để xây dựng bộ ứng dụng mới cho thiết bị.', 'A B C D E F G H I', '1792415272_claudeopus.jpg', '2026-10-19 20:07:52');
+INSERT INTO `posts` (`id`, `category_id`, `title`, `summary`, `content`, `image`, `created_at`, `views`, `status`) VALUES
+(1, 1, 'Đánh giá các dòng smartphone mới nhất năm nay', 'Những dòng điện thoại cao cấp sở hữu chip xử lý mạnh mẽ và thời lượng pin sử dụng cả ngày.', 'Thị trường điện thoại thông minh năm nay tập trung vào các tính năng trí tuệ nhân tạo tích hợp trực tiếp trên máy. Ngoài ra, công nghệ tản nhiệt buồng hơi mới giúp máy luôn mát mẻ khi chơi game hoặc quay phim chất lượng cao.', 'DienThoai.jpg', '2026-10-16 20:30:51', 120, 1),
+(2, 2, 'Xu hướng laptop mỏng nhẹ dành cho học sinh, sinh viên', 'Các mẫu máy tính xách tay phân khúc tầm trung đáp ứng tốt nhu cầu học tập và lập trình.', 'Với trọng lượng chỉ khoảng 1.3kg cùng thời lượng pin lên đến 10 tiếng, thế hệ laptop mới mang lại sự tiện lợi tối đa cho người dùng thường xuyên phải di chuyển.', 'XuHuongLapTopHSSV.jpg', '2026-10-16 20:30:51', 95, 1),
+(3, 3, 'Ứng dụng thực tế của công nghệ mới trong đời sống', 'Các giải pháp tự động hóa giúp tối ưu hóa hiệu suất làm việc và giải phóng sức lao động.', 'Từ việc quản lý nhà thông minh, điều khiển giao thông đến hỗ trợ y tế từ xa, công nghệ đang ngày càng hiện diện rõ nét và nâng cao chất lượng cuộc sống của con người.', 'CongNgheDoiSong.jpg', '2026-10-16 20:30:51', 210, 1),
+(4, 4, 'Khám phá vũ trụ bao la qua kính viễn vọng không gian', 'Những hình ảnh sắc nét về các cụm thiên hà cách xa Trái Đất hàng triệu năm ánh sáng.', 'Kính viễn vọng thế hệ mới vừa gửi về những dữ liệu quý giá về các hành tinh ngoài hệ mặt trời, mở ra cơ hội lớn cho việc tìm kiếm những hành tinh có điều kiện sống tương tự Trái Đất.', 'KhamPhaVuTru.jpg', '2026-10-16 20:30:51', 45, 1),
+(5, 1, 'Công nghệ pin mới giúp kéo dài thời gian sử dụng thiết bị', 'Phát minh đột phá về vật liệu giúp sạc siêu nhanh và tăng tuổi thọ pin gấp nhiều lần.\r\nCác nhà khoa học phát triển công nghệ pin lithium-kim loại mới, hứa hẹn mang đến thời lượng sử dụng dài hơn và tốc độ sạc cực nhanh.', 'Theo tạp chí danh tiếng Advanced Materials, một nhóm nhà nghiên cứu tại Đại học Quốc gia Chonnam (Hàn Quốc) vừa phát triển thành công công nghệ pin lithium-kim loại mới hứa hẹn mang lại thời gian sử dụng kéo dài nhiều ngày cho smartphone và khả năng sạc đầy chỉ trong vài phút.\r\n\r\nCông nghệ pin mới giúp điện thoại dùng nhiều ngày, sạc đầy chỉ trong vài phút\r\nMột loại điện cực mới có thể khắc phục được vấn đề pin lithium\r\n\r\nPin lithium-kim loại là công nghệ pin sử dụng hóa học tương tự như pin lithium-ion truyền thống, nhưng thay thế than chì trong điện cực âm bằng lithium nguyên chất. Kết quả là mật độ năng lượng được tăng lên gấp 10 lần so với pin lithium-ion thông thường, đồng thời giảm trọng lượng và tăng tốc độ sạc.\r\n\r\nTuy nhiên, việc sử dụng lithium nguyên chất cũng đặt ra thách thức lớn, với sự hình thành của các nhánh tinh thể (dendrite). Những cấu trúc này có thể gây đoản mạch, làm thủng màng ngăn và dẫn đến hiện tượng quá nhiệt, gây cháy nổ.\r\n\r\nCông nghệ pin mới giúp điện thoại dùng nhiều ngày, sạc đầy chỉ trong vài phút\r\nSự hình thành các nhánh tinh thể trong pin lithium-kim loại\r\n\r\nBước đột phá trong công nghệ pin lithium-kim loại\r\nGiờ đây, nhóm nghiên cứu do Giáo sư Mincheol Chang của Đại học Quốc gia Chonnam dẫn đầu đã phát triển một chất điện phân rắn composite ba lớp mới giúp ngăn chặn sự hình thành các nhánh tinh thể. Chất điện phân này kết hợp các chất độn gốm với một chất đồng trùng hợp linh hoạt, cải thiện độ dẫn ion và độ bền cơ học.\r\n\r\nCấu trúc ba lớp của chất điện phân bao gồm hai lớp ngoài mềm hơn để tăng cường tiếp xúc với các kênh lithium, một lớp xương sống bên trong cứng chắc. Thiết kế này không chỉ cải thiện độ dẫn điện mà còn ngăn chặn sự hình thành các nhánh tinh thể.\r\n\r\nCông nghệ pin mới giúp điện thoại dùng nhiều ngày, sạc đầy chỉ trong vài phút\r\nĐiện thoại pin dung lượng lớn sạc đầy trong vài phút có thể sớm trở thành hiện thực\r\n\r\nTrong các thử nghiệm, nhóm nghiên cứu đã đạt được dung lượng 133,6 mAh/g với khả năng giữ dung lượng trên 80% sau 1.000 chu kỳ sạc/xả. Con số này tương đương với một viên pin 5.000 mAh chỉ với 37,5 gram vật liệu hoạt tính. Với trọng lượng của một viên pin smartphone thông thường từ 65 đến 80 gram, chúng ta có thể hướng tới những viên pin 10.000 mAh có khả năng sạc đầy chỉ trong vài phút.\r\n\r\nBáo cáo cho biết thêm, viên pin thử nghiệm vẫn hoạt động hiệu quả ngay cả khi bị gập đôi hoặc cắt một phần, từ đó mở ra nhiều cơ hội ứng dụng cho công nghệ này trong các thiết bị đeo được như nhẫn thông minh, kính thông minh và vòng đeo tay theo dõi sức khỏe.\r\n\r\nQuan trọng nhất, nghiên cứu không chỉ mang lại hy vọng cho tương lai của pin lithium-kim loại mà còn có thể cách mạng hóa ngành công nghiệp điện tử và xe điện.', 'CongNghePinMoi.jpg', '2026-10-16 20:30:51', 180, 1);
 
 -- --------------------------------------------------------
 
@@ -129,7 +130,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
