@@ -23,15 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($fullname) || empty($username) || empty($password) || empty($confirm_password)) {
         $error = 'Vui lòng nhập đầy đủ tất cả các trường thông tin!';
     
-    // Logic Ho va ten: Tu 2-50 ky tu, CHI DUOC CHUA CHU CAI VA KHOANG TRANG (Cấm số, ky tu dac biet)
+    // Logic Ho va ten: Chi chu cai va khoang trang
     } elseif (!preg_match('/^[\p{L}\s]{2,50}$/u', $fullname)) {
-        $error = 'Họ và tên không hợp lệ! Không được chứa số hoặc ký tự đặc biệt.';
+        $error = 'Họ và tên không hợp lệ! Chỉ được phép chứa chữ cái (có dấu) và khoảng trắng, không được chứa số hoặc ký tự đặc biệt.';
 
-    // Logic Username: 4-20 ky tu, chi chu cai khong dau, so, gach duoi
-    } elseif (!preg_match('/^[a-zA-Z0-9_]{4,20}$/', $username)) {
-        $error = 'Tên đăng nhập không hợp lệ! Phải từ 4-20 ký tự, không dấu cách, không ký tự đặc biệt.';
+    // Logic Username chat che: Bat buoc bat dau bang chu cai, khong chua __ lien tiep, khong ket thuc bang _
+    } elseif (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]{2,18}[a-zA-Z0-9]$/', $username) || strpos($username, '__') !== false) {
+        $error = 'Tên đăng nhập không hợp lệ! Phải từ 4-20 ký tự, bắt đầu bằng chữ cái, kết thúc bằng chữ hoặc số, không được chứa các dấu gạch dưới liên tiếp (__), không khoảng trắng và không ký tự lạ.';
 
-    // Logic Mat khau manh: Toi thieu 8 ky tu, gom it nhat 1 chu HOA, 1 chu thuong, 1 so, 1 ky tu dac biet
+    // Logic Mat khau manh
     } elseif (
         strlen($password) < 8 || 
         !preg_match('/[A-Z]/', $password) || 
@@ -108,13 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                             <form action="add_user.php" method="POST">
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold">Họ và tên (* Chỉ chữ cái và khoảng trắng, không số, không ký tự lạ)</label>
+                                    <label class="form-label small fw-bold">Họ và tên (* Chỉ chữ cái và khoảng trắng)</label>
                                     <input type="text" name="fullname" class="form-control" 
                                            placeholder="Ví dụ: Nguyễn Văn Bình" value="<?= htmlspecialchars($fullname) ?>" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold">Tên đăng nhập (* 4-20 ký tự, không dấu, không khoảng trắng, không ký tự đặc biệt)</label>
+                                    <label class="form-label small fw-bold">Tên đăng nhập (* 4-20 ký tự, bắt đầu bằng chữ cái, không chứa __ liên tiếp)</label>
                                     <input type="text" name="username" class="form-control" 
                                            placeholder="Ví dụ: vanbinh_2026" value="<?= htmlspecialchars($username) ?>" required>
                                 </div>

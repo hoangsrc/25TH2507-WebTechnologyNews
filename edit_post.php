@@ -8,6 +8,8 @@ if (!isset($_SESSION['admin'])) {
     exit();
 }
 
+$current_role = $_SESSION['role'] ?? 'editor';
+
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
     header("Location: admin.php");
@@ -36,33 +38,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $category_id = (int)$_POST['category_id'];
     $summary = trim($_POST['summary']);
     $content = trim($_POST['content']);
-    $image_name = $post['image']; // Mac dinh giu lai anh cu
+    
+    // Mac dinh giu lai anh cu
+    $image_name = $post['image']; 
 
     if (empty($title) || empty($summary) || empty($content) || $category_id <= 0) {
         $error = 'Vui lòng điền đầy đủ tất cả các trường thông tin!';
+    } elseif (mb_strlen($title, 'UTF-8') < 10) {
+        $error = 'Tiêu đề bài viết phải có ít nhất 10 ký tự!';
     } else {
         // Neu nguoi dung co chon tai len anh moi
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $allowed_exts = ['jpg', 'jpeg', 'png', 'webp'];
-            $file_info = pathinfo($_FILES['image']['name']);
-            $file_ext = strtolower($file_info['extension']);
-
-            if (in_array($file_ext, $allowed_exts)) {
-                $new_filename = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.]/', '', $file_info['basename']);
-                $target_path = 'uploads/' . $new_filename;
-
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
-                    $image_name = $new_filename;
-                }
+            $max_size = 2 * 1024 * 1024;
+            if ($_FILES['image']['size'] > $max_size) {
+                $error = 'Dung lượng tệp ảnh vượt quá 2MB!';
             } else {
-                $error = 'Chỉ chấp nhận các định dạng ảnh: JPG, JPEG, PNG, WEBP!';
+                $check_image = @getimagesize($_FILES['image']['tmp_name']);
+                if ($check_image === false) {
+                    $error = 'Tệp tải lên không phải là hình ảnh hợp lệ!';
+                } else {
+                    $allowed_exts = ['jpg', 'jpeg', 'png', 'webp'];
+                    $file_info = pathinfo($_FILES['image']['name']);
+                    $file_ext = strtolower($file_info['extension']);
+
+                    if (in_array($file_ext, $allowed_exts)) {
+                        $new_filename = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.]/', '', $file_info['basename']);
+                        $target_path = 'uploads/' . $new_filename;
+
+                        if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+                            // Xoa anh cu neu khong phai default.jpg
+                            if (!empty($post['image']) && $post['image'] !== 'default.jpg' && file_exists('uploads/' . $post['image'])) {
+                                unlink('uploads/' . $post['image']);
+                            }
+                            $image_name = $new_filename;
+                        }
+                    } else {
+                        $error = 'Chỉ chấp nhận các định dạng ảnh: JPG, JPEG, PNG, WEBP!';
+                    }
+                }
             }
         }
 
-        // Cap nhat du lieu vao CSDL
+        // Logic bien tap: Admin sua thi giu nguyen status, Editor sua thi BAT BUOC phải được duyet lai)
+        $new_status = ($current_role === 'admin') ? $post['status'] : 0;
+
         if (empty($error)) {
-            $update_stmt = mysqli_prepare($conn, "UPDATE posts SET category_id = ?, title = ?, summary = ?, content = ?, image = ? WHERE id = ?");
-            mysqli_stmt_bind_param($update_stmt, "issssi", $category_id, $title, $summary, $content, $image_name, $id);
+            $update_stmt = mysqli_prepare($conn, "UPDATE posts SET category_id = ?, title = ?, summary = ?, content = ?, image = ?, status = ? WHERE id = ?");
+            mysqli_stmt_bind_param($update_stmt, "issssii", $category_id, $title, $summary, $content, $image_name, $new_status, $id);
 
             if (mysqli_stmt_execute($update_stmt)) {
                 header("Location: admin.php");
@@ -86,7 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="bg-light">
 
     <div class="main-wrapper">
-        <!-- Header -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="admin.php">TechNews Admin</a>
@@ -98,13 +119,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </nav>
 
-        <!-- Form Chinh Sua -->
         <div class="container my-4">
             <div class="row justify-content-center">
                 <div class="col-lg-9">
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-white border-bottom py-3">
                             <h5 class="fw-bold m-0" style="color: var(--primary-red);">CHỈNH SỬA BÀI VIẾT #<?= $post['id'] ?></h5>
+                            <?php if ($current_role === 'editor'): ?>
+                                <small class="text-muted d-block mt-1 fst-italic">* Lưu ý: Sau khi Biên tập viên cập nhật, bài viết sẽ tự động chuyển về trạng thái Chờ duyệt lại.</small>
+                            <?php endif; ?>
                         </div>
                         <div class="card-body p-4">
 
@@ -114,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                             <form action="edit_post.php?id=<?= $post['id'] ?>" method="POST" enctype="multipart/form-data">
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold small">Tiêu đề bài viết (*)</label>
+                                    <label class="form-label fw-bold small">Tiêu đề bài viết (* Tối thiểu 10 ký tự)</label>
                                     <input type="text" name="title" class="form-control" 
                                            value="<?= htmlspecialchars($post['title']) ?>" required>
                                 </div>
@@ -132,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold small">Hình ảnh đại diện</label>
+                                        <label class="form-label fw-bold small">Hình ảnh đại diện (Tối đa 2MB)</label>
                                         <input type="file" name="image" class="form-control" accept="image/*">
                                         <div class="mt-2 d-flex align-items-center gap-2">
                                             <small class="text-muted">Ảnh hiện tại:</small>
@@ -148,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label fw-bold small">Nội dung chi tiết bài viết (*)</label>
+                                    <label class="form-label fw-bold small">Nội dung chi tiết (*)</label>
                                     <textarea name="content" class="form-control" rows="8" required><?= htmlspecialchars($post['content']) ?></textarea>
                                 </div>
 
@@ -167,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <footer class="site-footer py-3 text-center border-top">
         <div class="container small text-muted">
-            Hệ thống quản trị tin tức &copy; 2026
+            Hệ thống quản trị tin tức công nghệ &copy; 2026
         </div>
     </footer>
 
