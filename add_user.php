@@ -8,8 +8,6 @@ if (!isset($_SESSION['admin']) || $_SESSION['role'] !== 'admin') {
 }
 
 $error = '';
-$success = '';
-
 $fullname = '';
 $username = '';
 $role = 'editor';
@@ -25,9 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($fullname) || empty($username) || empty($password) || empty($confirm_password)) {
         $error = 'Vui lòng nhập đầy đủ tất cả các trường thông tin!';
     
-    // Logic Username: 4-20 ky tu, chi chu cai, so, gach duoi, khong dau cach, khong ky tu dac biet
+    // Logic Ho va ten: Tu 2-50 ky tu, CHI DUOC CHUA CHU CAI VA KHOANG TRANG (Cấm số, ky tu dac biet)
+    } elseif (!preg_match('/^[\p{L}\s]{2,50}$/u', $fullname)) {
+        $error = 'Họ và tên không hợp lệ! Không được chứa số hoặc ký tự đặc biệt.';
+
+    // Logic Username: 4-20 ky tu, chi chu cai khong dau, so, gach duoi
     } elseif (!preg_match('/^[a-zA-Z0-9_]{4,20}$/', $username)) {
-        $error = 'Tên đăng nhập không hợp lệ! Chỉ được từ 4-20 ký tự, gồm chữ cái không dấu, chữ số và dấu gạch dưới (không được chứa khoảng trắng hay ký tự đặc biệt).';
+        $error = 'Tên đăng nhập không hợp lệ! Phải từ 4-20 ký tự, không dấu cách, không ký tự đặc biệt.';
 
     // Logic Mat khau manh: Toi thieu 8 ky tu, gom it nhat 1 chu HOA, 1 chu thuong, 1 so, 1 ky tu dac biet
     } elseif (
@@ -37,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         !preg_match('/[0-9]/', $password) || 
         !preg_match('/[@#$%^&*!_\-]/', $password)
     ) {
-        $error = 'Mật khẩu chưa đủ độ mạnh! Phải có ít nhất 8 ký tự, bao gồm: chữ HOA, chữ thường, chữ số và ít nhất 1 ký tự đặc biệt (@, #, $, %, ^, &, *, !, _, -).';
+        $error = 'Mật khẩu chưa đủ mạnh! Phải có ít nhất 8 ký tự, gồm: chữ HOA, chữ thường, chữ số và ký tự đặc biệt (@, #, $, %, ^, &, *, !, _, -).';
 
     // Kiem tra khop mat khau
     } elseif ($password !== $confirm_password) {
@@ -59,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             mysqli_stmt_bind_param($stmt_insert, "ssss", $username, $hashed_password, $fullname, $role);
 
             if (mysqli_stmt_execute($stmt_insert)) {
+                $_SESSION['flash_msg'] = "Tạo tài khoản '$username' thành công!";
                 header("Location: manage_users.php");
                 exit();
             } else {
@@ -105,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                             <form action="add_user.php" method="POST">
                                 <div class="mb-3">
-                                    <label class="form-label small fw-bold">Họ và tên (*)</label>
+                                    <label class="form-label small fw-bold">Họ và tên (* Chỉ chữ cái và khoảng trắng, không số, không ký tự lạ)</label>
                                     <input type="text" name="fullname" class="form-control" 
                                            placeholder="Ví dụ: Nguyễn Văn Bình" value="<?= htmlspecialchars($fullname) ?>" required>
                                 </div>

@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Chi Admin moi co quyen truy cap trang nay
+// Chi Admin moi co quyen truy cap
 if (!isset($_SESSION['admin']) || $_SESSION['role'] !== 'admin') {
     die("
         <div style='text-align:center; padding:50px; font-family:Arial, sans-serif;'>
@@ -13,20 +13,21 @@ if (!isset($_SESSION['admin']) || $_SESSION['role'] !== 'admin') {
     ");
 }
 
-$msg = '';
-$err = '';
-
-// Xu ly Mo khoa tai khoan
+// Xu ly Mo khoa tai khoan va Redirect ve URL, Flash Message
 if (isset($_GET['unlock_id'])) {
     $unlock_id = (int)$_GET['unlock_id'];
-    $stmt_unlock = mysqli_prepare($conn, "UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?");
-    mysqli_stmt_bind_param($stmt_unlock, "i", $unlock_id);
-    if (mysqli_stmt_execute($stmt_unlock)) {
-        $msg = "Đã mở khóa tài khoản thành công!";
+    if ($unlock_id > 0) {
+        $stmt_unlock = mysqli_prepare($conn, "UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?");
+        mysqli_stmt_bind_param($stmt_unlock, "i", $unlock_id);
+        if (mysqli_stmt_execute($stmt_unlock)) {
+            $_SESSION['flash_msg'] = "Đã mở khóa tài khoản thành công!";
+        }
     }
+    header("Location: manage_users.php");
+    exit();
 }
 
-// Xu ly Xoa tai khoan
+// Xu ly Xoa tai khoan va Redirect ve URL sach
 if (isset($_GET['del_id'])) {
     $del_id = (int)$_GET['del_id'];
     
@@ -38,15 +39,23 @@ if (isset($_GET['del_id'])) {
     $target_user = mysqli_fetch_assoc($res_check);
 
     if ($target_user && $target_user['username'] === $_SESSION['admin']) {
-        $err = "Bạn không thể tự xóa tài khoản của chính mình!";
+        $_SESSION['flash_err'] = "Bạn không thể tự xóa tài khoản của chính mình!";
     } else {
         $stmt_del = mysqli_prepare($conn, "DELETE FROM users WHERE id = ?");
         mysqli_stmt_bind_param($stmt_del, "i", $del_id);
         if (mysqli_stmt_execute($stmt_del)) {
-            $msg = "Đã xóa tài khoản thành công!";
+            $_SESSION['flash_msg'] = "Đã xóa tài khoản thành công!";
         }
     }
+    header("Location: manage_users.php");
+    exit();
 }
+
+// Lay thong bao tam thoi va xoa ngay khoi Session (Chi hien 1 lan)
+$msg = $_SESSION['flash_msg'] ?? '';
+$err = $_SESSION['flash_err'] ?? '';
+unset($_SESSION['flash_msg']);
+unset($_SESSION['flash_err']);
 
 // Lay danh sach toan bo tai khoan
 $sql_users = "SELECT * FROM users ORDER BY id ASC";
@@ -82,6 +91,7 @@ $res_users = mysqli_query($conn, $sql_users);
                 <a href="add_user.php" class="btn btn-success btn-sm">+ Tạo tài khoản mới</a>
             </div>
 
+            <!-- Thong bao se tu dong bien mat sau khi F5 -->
             <?php if (!empty($msg)): ?>
                 <div class="alert alert-success py-2"><?= htmlspecialchars($msg) ?></div>
             <?php endif; ?>
