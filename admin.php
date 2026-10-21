@@ -53,6 +53,9 @@ $result = mysqli_query($conn, $sql);
                             <span class="badge bg-info text-dark ms-1">Biên tập viên</span>
                         <?php endif; ?>
                     </span>
+                    <?php if ($current_role === 'admin'): ?>
+                        <a href="manage_users.php" class="btn btn-warning btn-sm fw-bold">Quản lý tài khoản</a>
+                    <?php endif; ?>
                     <a href="index.php" class="btn btn-outline-light btn-sm" target="_blank">Xem trang chủ</a>
                     <a href="logout.php" class="btn btn-danger btn-sm">Đăng xuất</a>
                 </div>
