@@ -271,43 +271,39 @@ $res_popular = mysqli_query($conn, "SELECT id, title, views FROM posts WHERE sta
     </div>
     
     <!-- Footer bao chi -->
+    <!-- Footer bao chi -->
     <footer class="site-footer pt-4 pb-3">
         <div class="container">
-            <div class="row row-cols-2 row-cols-md-4 g-3 pb-3 mb-3 border-bottom">
+            <div class="row row-cols-1 row-cols-md-3 g-4 pb-3 mb-3 border-bottom">
+                <!-- Cot 1 -->
                 <div>
-                    <div class="footer-section-title">Chuyên mục</div>
+                    <div class="footer-section-title">Chuyên mục công nghệ</div>
                     <ul class="list-unstyled small">
-                        <li><a href="index.php?cat_id=1">Điện thoại di động</a></li>
-                        <li><a href="index.php?cat_id=2">Máy tính xách tay</a></li>
-                        <li><a href="index.php?cat_id=3">Trí tuệ nhân tạo</a></li>
+                        <?php foreach ($all_cats as $c): ?>
+                            <li class="mb-1">
+                                <a href="index.php?cat_id=<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></a>
+                            </li>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
+
+                <!-- Cot 2 -->
                 <div>
-                    <div class="footer-section-title">Khoa học</div>
+                    <div class="footer-section-title">Hệ thống</div>
                     <ul class="list-unstyled small">
-                        <li><a href="index.php?cat_id=4">Khám phá công nghệ</a></li>
-                        <li><a href="index.php">Thế giới số</a></li>
-                        <li><a href="index.php">Ứng dụng đời sống</a></li>
+                        <li class="mb-1"><a href="index.php">Trang chủ tin tức</a></li>
+                        <li class="mb-1"><a href="login.php">Khu vực quản trị</a></li>
                     </ul>
                 </div>
+
+                <!-- Cot 3-->
                 <div>
-                    <div class="footer-section-title">Vận hành</div>
-                    <ul class="list-unstyled small">
-                        <li><a href="login.php">Khu vực quản trị</a></li>
-                        <li><a href="index.php">Điều khoản quy định</a></li>
-                        <li><a href="index.php">Chính sách bảo mật</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <div class="footer-section-title">Tòa soạn</div>
-                    <p class="small text-muted mb-0">
-                        Hệ thống tin tức công nghệ trực tuyến.<br>
-                        Email: toasoan@technews.vn<br>
-                        Đường dây nóng: 1900 xxxx
-                    </p>
+                    <div class="footer-section-title">Tòa soạn TechNews</div>
+                    <p class="small text-muted mb-1">Cổng thông tin điện tử công nghệ mô phỏng phục vụ học tập.</p>
+                    <p class="small text-muted mb-1">Email: toasoan@technews.vn</p>
+                    <p class="small text-muted mb-0">Đường dây nóng: 1900 xxxx</p>
                 </div>
             </div>
-
             <div class="d-flex flex-wrap justify-content-between align-items-center small text-muted">
                 <div>
                     <strong>TECHNEWS.VN</strong> - Trang thông tin điện tử công nghệ  &copy; 2026 TechNews  
