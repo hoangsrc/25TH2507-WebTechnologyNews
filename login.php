@@ -2,7 +2,6 @@
 session_start();
 require_once 'db.php';
 
-// Neu da dang nhap roi thi chuyen thang vao admin
 if (isset($_SESSION['admin'])) {
     header("Location: admin.php");
     exit();
@@ -10,18 +9,9 @@ if (isset($_SESSION['admin'])) {
 
 $error = '';
 
- // Thoi gian khoa tam thoi: 60 giay
-$lock_duration = 60;
+// Bien danh dau o nao bi loi: 'username' hoac 'password' hoac 'all'
+$err_field = ''; 
 
-// Khoi tao mang luu so lan sai va thoi gian khoa rieng cho tung user
-if (!isset($_SESSION['login_attempts']) || !is_array($_SESSION['login_attempts'])) {
-    $_SESSION['login_attempts'] = [];
-}
-if (!isset($_SESSION['lock_time']) || !is_array($_SESSION['lock_time'])) {
-    $_SESSION['lock_time'] = [];
-}
-
-// Logic Lay ten da luu neu co
 $saved_username = isset($_COOKIE['remember_user']) ? $_COOKIE['remember_user'] : '';
 $username = isset($_POST['username']) ? trim($_POST['username']) : $saved_username;
 
@@ -29,10 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
     $remember = isset($_POST['remember']);
 
-    if (empty($username) || empty($password)) {
+    if (empty($username) && empty($password)) {
         $error = 'Vui lòng nhập đầy đủ tài khoản và mật khẩu!';
+        $err_field = 'all';
+    } elseif (empty($username)) {
+        $error = 'Tài khoản không được để trống!';
+        $err_field = 'username';
+    } elseif (empty($password)) {
+        $error = 'Mật khẩu không được để trống!';
+        $err_field = 'password';
     } else {
-        // Lay thong tin user tu CSDL
         $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE username = ?");
         mysqli_stmt_bind_param($stmt, "s", $username);
         mysqli_stmt_execute($stmt);
@@ -40,16 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = mysqli_fetch_assoc($result);
 
         if ($user) {
-            // Kiem tra tai khoan co bi khoa trong CSDL khong
             $is_locked = (!empty($user['locked_until']) && strtotime($user['locked_until']) > time());
 
             if ($is_locked) {
                 $time_left = ceil((strtotime($user['locked_until']) - time()) / 60);
-                $error = "Tài khoản '$username' đang bị tạm khóa (còn khoảng $time_left phút). Vui lòng đợi hoặc liên hệ Quản trị viên để mở khóa!";
+                $error = "Tài khoản '$username' đang bị tạm khóa (còn khoảng $time_left phút). Vui lòng liên hệ Admin để mở khóa!";
+                $err_field = 'username';
             } else {
-                // Kiem tra mat khau
                 if (password_verify($password, $user['password']) || $password === $user['password']) {
-                    // Dang nhap dung -> Reset so lan sai ve 0
+                    // Reset so lan sai
                     $stmt_reset = mysqli_prepare($conn, "UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?");
                     mysqli_stmt_bind_param($stmt_reset, "i", $user['id']);
                     mysqli_stmt_execute($stmt_reset);
@@ -67,25 +62,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     header("Location: admin.php");
                     exit();
                 } else {
-                    // Dang nhap sai -> Tang bien dem trong CSDL
                     $attempts = $user['failed_attempts'] + 1;
                     if ($attempts >= 5) {
-                        // Khoa 15 phut trong CSDL
                         $stmt_lock = mysqli_prepare($conn, "UPDATE users SET failed_attempts = ?, locked_until = DATE_ADD(NOW(), INTERVAL 15 MINUTE) WHERE id = ?");
                         mysqli_stmt_bind_param($stmt_lock, "ii", $attempts, $user['id']);
                         mysqli_stmt_execute($stmt_lock);
-                        $error = "Tài khoản '$username' đã nhập sai 5 lần và bị khóa 15 phút. Liên hệ Admin để mở khóa ngay!";
+                        $error = "Tài khoản '$username' đã nhập sai 5 lần và bị khóa 15 phút. Liên hệ Admin để mở khóa!";
                     } else {
                         $stmt_fail = mysqli_prepare($conn, "UPDATE users SET failed_attempts = ? WHERE id = ?");
                         mysqli_stmt_bind_param($stmt_fail, "ii", $attempts, $user['id']);
                         mysqli_stmt_execute($stmt_fail);
                         $remaining = 5 - $attempts;
-                        $error = "Mật khẩu không chính xác! (Tài khoản '$username' còn lại $remaining lần thử)";
+                        $error = "Mật khẩu không chính xác! (Còn lại $remaining lần thử)";
                     }
+                    
+                    // Vieng do o mat khau
+                    $err_field = 'password';
                 }
             }
         } else {
             $error = 'Tài khoản không tồn tại trên hệ thống!';
+
+             // Vieng do o tai khoan
+            $err_field = 'username';
         }
     }
 }
@@ -112,16 +111,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="alert alert-danger py-2 small"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
 
-            <form action="login.php" method="POST">
+            <form action="login.php" method="POST" novalidate>
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Tài khoản</label>
-                    <input type="text" name="username" class="form-control" 
-                           placeholder="Nhập username..." value="<?= htmlspecialchars($username) ?>" required>
+                    <input type="text" name="username" 
+                           class="form-control <?= ($err_field === 'username' || $err_field === 'all') ? 'is-invalid' : '' ?>" 
+                           placeholder="Nhập username..." value="<?= htmlspecialchars($username) ?>">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Mật khẩu</label>
-                    <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu..." required>
+                    <input type="password" name="password" 
+                           class="form-control <?= ($err_field === 'password' || $err_field === 'all') ? 'is-invalid' : '' ?>" 
+                           placeholder="Nhập mật khẩu...">
                 </div>
 
                 <div class="mb-3 form-check">
