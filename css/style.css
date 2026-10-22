@@ -73,6 +73,10 @@ img {
 .category-navbar {
     background-color: #ffffff;
     border-bottom: 2px solid var(--primary-red);
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
 }
 
 .category-navbar .nav-link {
